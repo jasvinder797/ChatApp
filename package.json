@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "hat": "0.0.3",
+    "mongodb": "^3.0.5",
+    "mongoose": "^5.0.13",
+    "nodemailer": "^4.6.4"
+  }
+}
