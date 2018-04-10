@@ -1,62 +1,82 @@
 var express = require("express"),
 router = express.Router(),
-user = require("../models/user.js");
+user = require("../models/user.js"),
+inviteUser = require("../models/invite.js");
 var hat = require('hat');
 //var serverpath="http://localhost:8000/"
 var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+    user: 'ss4u.team.node@gmail.com',
+    pass: 'Node Pass797'
   }
 });
-router.post("/", function(req, res) {
-    
-    var obj = req.body;
-    var eml = req.body.email;
+router.post("/register", function(req, res) {
+   
+    var obj = new Object();
+    obj.pass = req.body.pass;
+    obj.name = req.body.name;
+    obj.phone = req.body.phone;
     obj.token = hat();
     obj.active = false;
-    var model = new user(obj);
-    var myquery = { email:  eml};
-    user.findOne(myquery,function(err, result){
+   console.log(obj.name)
+    var myquery = { token:  req.body.token};
+    inviteUser.findOne(myquery,function(err, result){
        if(err){
-            res.json({ message: 'Record fetching failed' });
+            res.send('Record fetching failed');
         }
         else if(result){
-            res.json({ message: 'Account With this email already exist' });
-        }
-       else{
-             model.save(function(err) {
-                if (err) {
-                res.json({ success: false, message: 'Failed to register user', error:err});
-                return;
+             console.log(result.email)
+            obj.email = result.email;
+            if(result.type=="Admin"){
+                obj.admin = true;
             }
             else{
-                var path = "https://localhost:8000/everify.html?id="+model.token;
-                var mailOptions = {
-                  from: 'youremail@gmail.com',
-                  to: req.body.email,
-                  subject: "Email verification require",
-                  text: 'That was easy!',
-                  html:'<p>Please click below the link</p><a href="'+path+'">Verify Email</a>'
-                };
+                obj.admin = false;
+            }
+            var myquery1 = { email: obj.email};
+            user.findOne(myquery1,function(err, result){
+               if(err){
+                    res.send('Record fetching failed');
+                }
+                else if(result){
+                     res.send('User with '+obj.email+' already registered. Please Login!'); 
+                }
+                else if(!result){
+                      var model = new user(obj);
+                        model.save(function(err) {
+                            if (err) {
+                            res.json({ success: false, message: 'Failed to register user', error:err});
+                            return;
+                        }
+                        else{
+                            var path = "https://localhost:8000/everify.html?id="+obj.token;
+                            var mailOptions = {
+                              from: 'youremail@gmail.com',
+                              to: obj.email,
+                              subject: "Email verification require",
+                              text: 'That was easy!',
+                              html:'<p>Please click below the link</p><a href="'+path+'">Verify Email</a>'
+                            };
 
-                transporter.sendMail(mailOptions, function(error, info){
-                  if (error) {
-                    console.log(error);
-                  } else {
-                    console.log('Email sent: ' + info.response);
-                    res.send('Account created please check your email for verification' );
-                  }
-                });
-            }                
-         })
-       }
+                            transporter.sendMail(mailOptions, function(error, info){
+                              if (error) {
+                                console.log(error);
+                              } else {
+                                console.log('Email sent: ' + info.response);
+                                res.send('Account created please check your email for verification' );
+                              }
+                            });
+                        }                
+                     })
+                }
+            })
+        }
      })
 })
 
-router.post("/login/", function(req, res) {
+router.post("/login", function(req, res) {
     var eml = req.body.email;
     var pss = req.body.pass;
     //var myquery = {pass: pss};
@@ -70,12 +90,20 @@ router.post("/login/", function(req, res) {
         }
         else if(result){
             if(!result.active){
-                 res.json({ message: 'You have not verified your account. Please check your email for verification link' });
+               // console.log("dkkjd")
+                 res.send('You have not verified your account. Please check your email for verification link');
+            }
+            else{
+                var resUser = new Object();
+                resUser.name = result.name;
+                resUser.admin = result.admin;
+                resUser.email = result.email;
+                res.send(resUser);
             }
         }
-       else{
-             res.json({ message: 'Account With this email already exist' });
-       }
+        else{
+             res.send('Login failed');
+        }
      })
 })
 router.get("/", function(req, res) {
@@ -85,8 +113,19 @@ router.get("/", function(req, res) {
         res.json({ success: false, message: 'Data fetch failed' });
        }
        else{
+           console.log(result.length)
         res.status(200);
-        res.send(result);
+           var resultArr=[];
+           for(var i = 0;i<result.length;i++)
+               {
+                   var obj = new Object();
+                   obj.name = result[i].name;
+                   obj.email = result[i].email;
+                    resultArr.push(obj);
+                   console.log(result[i].name)
+                   
+               }
+        res.json({ success: true, data: resultArr });
        }
      })
 

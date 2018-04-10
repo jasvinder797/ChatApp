@@ -1,8 +1,10 @@
 console.log = function(){};  /*disable all console log */
-
+var email="";
 window.onload = function() {
    CloseInput();
-    var ajaxRequest = new XMLHttpRequest();
+}
+function getUserList(){
+      var ajaxRequest = new XMLHttpRequest();
     if (ajaxRequest) {
 			ajaxRequest.onreadystatechange = ajaxResponse;
 			ajaxRequest.open("GET", "api/user/"); // Where?
@@ -22,7 +24,6 @@ window.onload = function() {
         }
     }
 }
-
 function saveRecord(){
     var order = new Object();
     order.name = document.getElementById('add_name').value;
@@ -60,15 +61,17 @@ function saveRecord(){
 
 function createList(obj){
 
-     var data = JSON.parse(obj)  /*Convert string data to JSON Oject*/
+     var data = JSON.parse(obj);
+    alert(data.data[0].name);
+     /*Convert string data to JSON Oject*/
      var rowString ="";
      for(var i=0;i<data.length;i++){
-         var id = data[i]._id;
-         if(data[i].active){
-             rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">Yes</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
+         var id = data[i].id;
+         if(data[i].admin){
+             rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
          }
          else{
-              rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">No</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
+              rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">Non Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
          }
          
         }
@@ -133,7 +136,7 @@ function login(){
     var ajaxRequest = new XMLHttpRequest();
 	if (ajaxRequest) {
         ajaxRequest.onreadystatechange = ajaxResponse;
-        ajaxRequest.open("POST", "/api/user/login/");
+        ajaxRequest.open("POST", "/api/user/login");
         ajaxRequest.setRequestHeader("Content-Type", "application/json");
         ajaxRequest.send(JSON.stringify(obj));
 	}
@@ -141,14 +144,87 @@ function login(){
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
         }else if(ajaxRequest.status == 200){
-            createForm(ajaxRequest.response,id);
+            alert(this.responseText);
+            afterLogin(ajaxRequest.response)
         }
         else{
             console.log("Error")
         }
   }
 }
-
+function afterLogin(obj){
+    
+    var data = JSON.parse(obj);   
+    email = data.email;
+    if(data.admin){
+        showAdmin();
+    }
+   // alert(data.name)
+}
+//user invitation
+function inviteUser(){
+    var obj = new Object();
+    obj.type = document.getElementById('invite_type').value;
+    obj.email =document.getElementById('invite_email').value;
+    obj.aemail =email;
+    var eml = obj.email;
+    //alert(email);
+    var ajaxRequest = new XMLHttpRequest();
+	if (ajaxRequest) {
+        ajaxRequest.onreadystatechange = ajaxResponse;
+        ajaxRequest.open("POST", "/api/invite/");
+        ajaxRequest.setRequestHeader("Content-Type", "application/json");
+        ajaxRequest.send(JSON.stringify(obj));
+	}
+    function ajaxResponse() {//This gets called when the readyState changes.
+        if(ajaxRequest.readyState != 4){
+            console.log("its in process")
+        }
+        else if(ajaxRequest.status == 200){
+            afterInvite(ajaxRequest.response,eml);
+        }
+        else{
+            console.log("Error")
+        }
+  }
+}
+function afterInvite(obj,eml){
+    var data = JSON.parse(obj);
+    if(data.flag){
+        var cc = confirm(data.message);
+        if (cc == true){
+            inviteAgain(eml);
+        } 
+        else{
+              //do nothing 
+        }
+    }
+    else{
+        alert(data.message)
+    }
+}
+function inviteAgain(eml)
+{
+    var obj = new Object();
+    obj.email =eml;
+    var ajaxRequest = new XMLHttpRequest();
+	if (ajaxRequest) {
+        ajaxRequest.onreadystatechange = ajaxResponse;
+        ajaxRequest.open("POST", "/api/invite/resend");
+        ajaxRequest.setRequestHeader("Content-Type", "application/json");
+        ajaxRequest.send(JSON.stringify(obj));
+	}
+    function ajaxResponse() {//This gets called when the readyState changes.
+        if(ajaxRequest.readyState != 4){
+            console.log("its in process")
+        }else if(ajaxRequest.status == 200){
+            alert(this.responseText);
+        }
+        else{
+            console.log("Error")
+        }
+  }
+}
 function createForm(obj,id){
     var data = JSON.parse(obj);   
     var formString ="";
@@ -190,23 +266,33 @@ function updateRec(id){
 }
 
 function CloseInput(){
-   
-      $("#addEmp").show();
-       $("#formLogin").hide();
+    $("#formLogin").show();
+    $("#afterLogin").hide();
 }
 function showLogin(){
-   
-      $("#addEmp").hide();
-       $("#formLogin").show();
+    $("#formLogin").show();
+    $("#afterLogin").hide();
 }
-
+function showAdmin(){
+    $("#formLogin").hide();
+    $("#afterLogin").show();
+}
+function showUser(){
+    $("#invite").hide();
+    $("#users").show();
+    getUserList();
+}
+function showInvite(){
+    $("#invite").show();
+    $("#users").hide();
+}
 //other js
-$("#login").click(function(event){
-    showLogin();
-        event.preventDefault();
-});
-$("#register").click(function(event){
-    CloseInput();
-        event.preventDefault();
-});
+//$("#userList").click(function(){
+//   showUser()
+//       // event.preventDefault();
+//});
+//$("#register").click(function(event){
+//    CloseInput();
+//        event.preventDefault();
+//});
 

@@ -6,11 +6,12 @@ var mongoose = require("mongoose"),
 var userSchema = new Schema({
 
    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    email: { type: String, required: true },
-    pass: { type: String, required: true },
-    token: { type: String, required: true },
-    active: { type: Boolean, required: true },
+   phone: { type: String, required: true },
+   email: { type: String, required: true },
+   pass: { type: String, required: true },
+   token: { type: String, required: true },
+   active: { type: Boolean, required: true },
+   admin: { type: Boolean, required: true },
  
 },{ versionKey: false });
 

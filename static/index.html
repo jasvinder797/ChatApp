@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Array CRUD</title>
   <style>
-      #loginform_container,#form_container{
+      #loginform_container,#form_container,#invite_container{
               width: 60%;
             padding: 1% 5% 5% 5%;
             margin: 0 auto;
@@ -17,7 +17,7 @@
           text-align: center;
           padding-top: 2%;
       }
-      #formLogin,#addEmp, #editor
+      #formLogin,#addEmp, #editor,#afterLogin
       {
           padding-top: 5%;
       }
@@ -63,37 +63,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
-<div id="addEmp">
-   
-    <div class="col-sm-12">
-    <div id="form_container">
-        <h1 class="text-center" style="padding-bottom: 2%;">Registration Form</h1>
-        <div class="form-group">
-          <label for="email">User Name :</label>
-          <input type="text" class="form-control"  placeholder="Enter Name" id="add_name">
-        </div>
-        <div class="form-group">
-          <label for="pwd">Phone</label>
-          <input type="number" class="form-control"  placeholder="Enter Phone" id="add_phone">
-        </div>
-         <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" class="form-control"  placeholder="Enter email" id="add_email">
-        </div>
-        <div class="form-group">
-          <label for="email">Password:</label>
-          <input type="password" class="form-control"  placeholder="Enter Password" id="add_pass">
-        </div>
-        <div class="form-group">
-            <div class="col-sm-4"><button onclick="saveRecord();" class="btn btn-success" >Submit</button></div>
-            <a href="#" style="font-size: 16px;" id="login"><div class="col-sm-8">Already registered. Login to your account</div></a>
-        </div>
-      
-    </div>
-    
- </div>
-   
-</div>
 <div id="formLogin">
     <div class="col-sm-12">
     <div id="loginform_container">
@@ -108,7 +77,7 @@
         </div>
         <div class="form-group">
             <div class="col-sm-4"><button onclick="login();" class="btn btn-success" >Submit</button></div>
-            <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>
+<!--            <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
         </div>
       
     </div>
@@ -116,27 +85,63 @@
  </div>
    
 </div>
-<div class="col-sm-12" id="show">
-   <div class="col-sm-1" > 
+<div id="afterLogin">
+    <div class="col-sm-12" style="padding-bottom: 2%">
+        <div class="col-sm-4 text-center">
+           <button onclick="inviteUser();" class="btn btn-info">Chat</button>
+        </div>
+        <div class="col-sm-4 text-center">
+           <button onclick="showInvite();" class="btn btn-warning">Invite</button>
+        </div>
+        <div class="col-sm-4 text-center">
+           <button onclick="showUser();" class="btn btn-success">Users</button>
+        </div>
     </div>
-    <div class="col-sm-10">
-      <table  class="equal-width">
-          <tr>
-            <th id="tt">User Name</th>
-               <th id="tt">Phone</th>
-               <th id="tt">Email</th>
-               <th id="tt">Activated</th> 
-              <th id="tt">Action</th>
-          </tr>
-        <tbody id="empTable">
+    <div class="col-sm-12" id="invite">
+        <div id="invite_container" >
+            <h1 class="text-center" style="padding-bottom: 2%;">Invite Form</h1>
+                <div class="form-group">
+                  <label for="email">Email:</label>
+                  <input type="email" class="form-control"  placeholder="Enter email" id="invite_email">
+                </div>
+                <div class="form-group">
+                    <label for="email">User Type:</label>
+                    <select type="password" class="form-control" id="invite_type">
+                      <option>Select User Type</option>
+                      <option>Admin</option>
+                      <option>Non Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-4"><button onclick="inviteUser();" class="btn btn-success" >Submit</button></div>
+    <!--                <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
+                </div>    
+        </div>
+    
+    </div>
+    <div class="col-sm-12" id="users">
+       <div class="col-sm-1" > 
+        </div>
+        <div class="col-sm-10">
+          <table  class="equal-width">
+              <tr>
+                <th id="tt">User Name</th>
+                   <th id="tt">Phone</th>
+                   <th id="tt">Email</th>
+                   <th id="tt">User Type</th> 
+                  <th id="tt">Action</th>
+              </tr>
+            <tbody id="empTable">
 
-        </tbody>
-        </table>
+            </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1" >
+
+        </div>
     </div>
-    <div class="col-sm-1" >
-      
-    </div>
-    </div>
+   
+</div>
 
 
 <script src="js/index.js"></script>
