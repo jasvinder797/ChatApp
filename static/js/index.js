@@ -1,7 +1,83 @@
 console.log = function(){};  /*disable all console log */
-var email="";
+localStorage.setItem(email, "");
+var email="", userC ="";
+var socket = io.connect('');
+var color = "";
+var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#00B3E6', 
+     '#3366E6', '#999966', '#99FF99', '#B34D4D',
+      '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+      '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+      '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+      '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+      '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+      '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+      '#FF3380',  '#66E64D', '#4D80CC', '#9900B3', 
+      '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
+function randomColor(){
+    for (var i = colorArray.length - 1; i >= 0; i--) {
+        var randomIndex = Math.floor(Math.random() * colorArray.length);
+        return colorArray[randomIndex];
+    }
+}
+socket.on("userList",function(userName,color){
+    //alert(userName); 
+    //var user = document.getElementById("users");
+    var str = '<center><li style="color:'+color+'">'+userName+' Connected</li></center>';
+    $("#oList").append(str);
+})
+socket.on("disconnec",function(userName,color){
+    //alert(userName); 
+    //var user = document.getElementById("users");
+    var str = '<center><li style="color:'+color+'">'+userName+' Disconnected</li></center>';
+    $("#oList").append(str);
+})
+function connectUser(userName){
+    color = randomColor();
+    userC = userName;
+    socket.emit('login',userName,color);
+}  
+function sendMessage(){
+    var message = document.getElementById('message').value;
+    socket.emit('sendMessage',localStorage.getItem('name'),message,color);
+      document.getElementById('message').value = "";
+  }
+socket.on("displayMsg",function(userName,message,color){
+    //console.log(userName); 
+    if(userC==userName)
+    {
+        var str = '<li style="color:'+color+'; text-align: right;">'+message+' : '+userName+'</li>';
+        $("#oList").append(str);
+    }
+    else
+    {
+        var str = '<li style="color:'+color+'; text-align: left;">'+userName+' : '+message+'</li>';
+        $("#oList").append(str);
+    }
+})
+$(window).on('keydown', function(e) {
+  if (e.which == 13) {
+    sendMessage();
+    return false;
+  }
+});
 window.onload = function() {
-   CloseInput();
+    if(localStorage.getItem('email')==null){
+       CloseInput()
+    }
+    else{
+        showAdmin();
+        connectUser(localStorage.getItem('name'));
+    }
+}
+function createOList(obj){
+     var data = JSON.parse(obj);
+     var rowString ="";
+     for(var i=0;i<data.data.length;i++){
+        var id =data.data[i].id;
+        rowString +='<li>'+data.data[i].name +'</li>';
+    }
+    var varChat =  document.getElementById('OnlineList');
+    varChat.innerHTML= rowString;
 }
 function getUserList(){
       var ajaxRequest = new XMLHttpRequest();
@@ -62,16 +138,16 @@ function saveRecord(){
 function createList(obj){
 
      var data = JSON.parse(obj);
-    alert(data.data[0].name);
+    //alert(data.data[0].id);
      /*Convert string data to JSON Oject*/
      var rowString ="";
-     for(var i=0;i<data.length;i++){
-         var id = data[i].id;
-         if(data[i].admin){
-             rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
+     for(var i=0;i<data.data.length;i++){
+         var id =data.data[i].id;
+         if(data.data[i].admin){
+             rowString +='<tr><td id="tt">'+data.data[i].name +'</td><td id="tt">'+data.data[i].phone +'</td><td id="tt">'+data.data[i].email +'</td><td id="tt">Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
          }
          else{
-              rowString +='<tr><td id="tt">'+data[i].name +'</td><td id="tt">'+data[i].phone +'</td><td id="tt">'+data[i].email +'</td><td id="tt">Non Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
+              rowString +='<tr><td id="tt">'+data.data[i].name +'</td><td id="tt">'+data.data[i].phone +'</td><td id="tt">'+data.data[i].email +'</td><td id="tt">Non Admin</td><td id="tt"><button onclick="updateRecord(\'' + id + '\')" class="btn btn-info test">Edit</button> <button onclick="requestForDelete(\'' + id + '\')" class="btn btn-warning">Delete</button></td></tr>';
          }
          
         }
@@ -144,7 +220,7 @@ function login(){
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
         }else if(ajaxRequest.status == 200){
-            alert(this.responseText);
+           //alert(this.responseText);
             afterLogin(ajaxRequest.response)
         }
         else{
@@ -153,14 +229,26 @@ function login(){
   }
 }
 function afterLogin(obj){
-    
-    var data = JSON.parse(obj);   
-    email = data.email;
-    if(data.admin){
-        showAdmin();
+    var data = JSON.parse(obj);
+    if(data.success){
+        if(data.data.admin){
+            email = data.data.email;
+            localStorage.setItem('email', email);
+            localStorage.setItem('name', data.data.name);
+            alert(data.message);
+            showAdmin();
+            connectUser(data.data.name);
+        }
+        else{
+             alert("Non Admin")
+        }
     }
-   // alert(data.name)
+    else{
+        alert(data.message);
+    }
+   
 }
+
 //user invitation
 function inviteUser(){
     var obj = new Object();
@@ -196,15 +284,14 @@ function afterInvite(obj,eml){
             inviteAgain(eml);
         } 
         else{
-              //do nothing 
+            //do nothing 
         }
     }
     else{
         alert(data.message)
     }
 }
-function inviteAgain(eml)
-{
+function inviteAgain(eml){
     var obj = new Object();
     obj.email =eml;
     var ajaxRequest = new XMLHttpRequest();
@@ -276,23 +363,29 @@ function showLogin(){
 function showAdmin(){
     $("#formLogin").hide();
     $("#afterLogin").show();
+    $("#users").hide();
+    
 }
 function showUser(){
     $("#invite").hide();
     $("#users").show();
+    $("#chatContainer").hide();
     getUserList();
+}
+function showChat(){
+    $("#invite").hide();
+    $("#users").hide();
+     $("#chatContainer").show();
+     $("#chat_window").show();
 }
 function showInvite(){
     $("#invite").show();
     $("#users").hide();
+    $("#chatContainer").hide();
+    
 }
-//other js
-//$("#userList").click(function(){
-//   showUser()
-//       // event.preventDefault();
-//});
-//$("#register").click(function(event){
-//    CloseInput();
-//        event.preventDefault();
-//});
-
+//for chat.....
+function logout(){
+    localStorage.clear();
+    onload();
+}

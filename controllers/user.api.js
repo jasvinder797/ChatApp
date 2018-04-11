@@ -86,23 +86,23 @@ router.post("/login", function(req, res) {
     user.findOne(myquery,function(err, result){
        if(err){
            console.log(err);
-            res.json({ message: 'Record fetching failed' });
+            res.json({ success: false, message: err });
         }
         else if(result){
             if(!result.active){
                // console.log("dkkjd")
-                 res.send('You have not verified your account. Please check your email for verification link');
+                res.json({ success: false, message: 'You have not verified your account. Please check your email for verification link' });
             }
             else{
                 var resUser = new Object();
                 resUser.name = result.name;
                 resUser.admin = result.admin;
                 resUser.email = result.email;
-                res.send(resUser);
+                res.json({ success: true, message: 'Login Successfull', data: resUser});
             }
         }
         else{
-             res.send('Login failed');
+              res.json({ success: false, message: 'Login failed'});
         }
      })
 })
@@ -121,6 +121,9 @@ router.get("/", function(req, res) {
                    var obj = new Object();
                    obj.name = result[i].name;
                    obj.email = result[i].email;
+                   obj.phone = result[i].phone;
+                   obj.admin = result[i].admin;
+                   obj.id = result[i].id;
                     resultArr.push(obj);
                    console.log(result[i].name)
                    

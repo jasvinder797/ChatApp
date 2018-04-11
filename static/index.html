@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <title>Array CRUD</title>
   <style>
+      #c_container{
+          width: 80%;
+            padding: 1% 5% 5% 5%;
+            margin: 0 auto;
+            height: auto;
+            border: 1px solid #f3e2e2;
+            box-shadow: 9px 9px 9px 5px #dac9c9; 
+      }
       #loginform_container,#form_container,#invite_container{
               width: 60%;
             padding: 1% 5% 5% 5%;
@@ -57,93 +65,117 @@
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet" id="bootstrap-css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 </head>
 <body>
-<div id="formLogin">
-    <div class="col-sm-12">
-    <div id="loginform_container">
-        <h1 class="text-center" style="padding-bottom: 2%;">Login Form</h1>
-         <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" class="form-control"  placeholder="Enter email" id="login_email">
+    <div id="formLogin">
+        <div class="col-sm-12">
+        <div id="loginform_container">
+            <h1 class="text-center" style="padding-bottom: 2%;">Login Form</h1>
+             <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" class="form-control"  placeholder="Enter email" id="login_email">
+            </div>
+            <div class="form-group">
+              <label for="email">Password:</label>
+              <input type="password" class="form-control"  placeholder="Enter Password" id="login_pass">
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"><button onclick="login();" class="btn btn-success" >Submit</button></div>
+    <!--            <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
+            </div>
+
         </div>
-        <div class="form-group">
-          <label for="email">Password:</label>
-          <input type="password" class="form-control"  placeholder="Enter Password" id="login_pass">
-        </div>
-        <div class="form-group">
-            <div class="col-sm-4"><button onclick="login();" class="btn btn-success" >Submit</button></div>
-<!--            <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
-        </div>
-      
+
+     </div>
+
     </div>
-    
- </div>
-   
-</div>
-<div id="afterLogin">
-    <div class="col-sm-12" style="padding-bottom: 2%">
-        <div class="col-sm-4 text-center">
-           <button onclick="inviteUser();" class="btn btn-info">Chat</button>
+    <div id="afterLogin">
+        <div class="col-sm-12" style="padding-bottom: 2%">
+            <div class="col-sm-3 text-center">
+               <button onclick="showChat();" class="btn btn-info">Chat</button>
+            </div>
+            <div class="col-sm-3 text-center">
+               <button onclick="showInvite();" class="btn btn-warning">Invite</button>
+            </div>
+            <div class="col-sm-3 text-center">
+               <button onclick="showUser();" class="btn btn-success">Users</button>
+            </div>
+            <div class="col-sm-3 text-center">
+               <button onclick="logout();" class="btn btn-success">Logout</button>
+            </div>
         </div>
-        <div class="col-sm-4 text-center">
-           <button onclick="showInvite();" class="btn btn-warning">Invite</button>
+        <div class="col-sm-12" id="invite">
+            <div id="invite_container" >
+                <h1 class="text-center" style="padding-bottom: 2%;">Invite Form</h1>
+                    <div class="form-group">
+                      <label for="email">Email:</label>
+                      <input type="email" class="form-control"  placeholder="Enter email" id="invite_email">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">User Type:</label>
+                        <select type="password" class="form-control" id="invite_type">
+                          <option>Select User Type</option>
+                          <option>Admin</option>
+                          <option>Non Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4"><button onclick="inviteUser();" class="btn btn-success" >Submit</button></div>
+        <!--                <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
+                    </div>    
+            </div>
+
         </div>
-        <div class="col-sm-4 text-center">
-           <button onclick="showUser();" class="btn btn-success">Users</button>
+        <div class="col-sm-12" id="users">
+           <div class="col-sm-1" > 
+            </div>
+            <div class="col-sm-10">
+              <table  class="equal-width">
+                  <tr>
+                    <th id="tt">User Name</th>
+                       <th id="tt">Phone</th>
+                       <th id="tt">Email</th>
+                       <th id="tt">User Type</th> 
+                      <th id="tt">Action</th>
+                  </tr>
+                <tbody id="empTable">
+
+                </tbody>
+                </table>
+            </div>
+            <div class="col-sm-1" >
+
+            </div>
         </div>
-    </div>
-    <div class="col-sm-12" id="invite">
-        <div id="invite_container" >
-            <h1 class="text-center" style="padding-bottom: 2%;">Invite Form</h1>
-                <div class="form-group">
-                  <label for="email">Email:</label>
-                  <input type="email" class="form-control"  placeholder="Enter email" id="invite_email">
+        <div id="chatContainer" class="col-sm-12">
+                <div class="chat_window" hidden id="chat_window">
+                    <div class="top_menu">
+                        <div class="buttons">
+                            <div class="button close"></div>
+                            <div class="button minimize"></div>
+                            <div class="button maximize"></div>
+                        </div><div class="title">Chat</div>
+                    </div>
+                    <ul class="messages" id="oList">
+                    </ul>
+                    <div class="bottom_wrapper clearfix">
+                        <div class="message_input_wrapper">
+                            <input class="message_input" placeholder="Type your message here..." id="message"/>
+                        </div>
+                        <div class="send_message">
+                            <div class="icon"></div>
+                            <button id="btn" class="btn btn-info" onclick="sendMessage();">Send</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="email">User Type:</label>
-                    <select type="password" class="form-control" id="invite_type">
-                      <option>Select User Type</option>
-                      <option>Admin</option>
-                      <option>Non Admin</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-4"><button onclick="inviteUser();" class="btn btn-success" >Submit</button></div>
-    <!--                <a href="#" style="font-size: 16px;" id="register"><div class="col-sm-8">Not registered? Create account</div></a>-->
-                </div>    
-        </div>
-    
-    </div>
-    <div class="col-sm-12" id="users">
-       <div class="col-sm-1" > 
-        </div>
-        <div class="col-sm-10">
-          <table  class="equal-width">
-              <tr>
-                <th id="tt">User Name</th>
-                   <th id="tt">Phone</th>
-                   <th id="tt">Email</th>
-                   <th id="tt">User Type</th> 
-                  <th id="tt">Action</th>
-              </tr>
-            <tbody id="empTable">
-
-            </tbody>
-            </table>
-        </div>
-        <div class="col-sm-1" >
-
         </div>
     </div>
-   
-</div>
-
-
 <script src="js/index.js"></script>
 
 </body>

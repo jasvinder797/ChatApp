@@ -8,8 +8,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+    user: 'ss4u.team.node@gmail.com',
+    pass: 'Node Pass797'
   }
 });
 router.post("/", function(req, res) {
@@ -23,17 +23,12 @@ router.post("/", function(req, res) {
     obj.type = req.body.type;
     console.log(aeml)
    
-    var myquery = { email:  aeml};
+    //var myquery = { email:  aeml};
     var myquery1 = { email:  eml};
-    user.findOne(myquery,function(err, result){
-       if(err){
-            res.json({ message: 'Record fetching failed' });
-        }
-        else if(result){
-            obj.invitedby = result._id;
-            var model = new inviteUser(obj);
-            //to check if already registered.
-            user.findOne(myquery1,function(err, result1){
+    obj.invitedby = aeml;
+    var model = new inviteUser(obj);
+    //to check if already registered.
+    user.findOne(myquery1,function(err, result1){
            if(err){
                 res.send(err);
             }
@@ -47,12 +42,10 @@ router.post("/", function(req, res) {
                     res.send(err);
                 }
                 else if(result2){
-                    res.json({ success: true, message: 'Invitation to '+eml+' already sent. Invite Again', flag:true});
+                    res.json({ success: true, message: 'Invitation to '+eml+' already sent. Invite Again?', flag:true});
                 }
                 else if (!result2){
-                   
                     //saving invite
-
                     model.save(function(err) {
                         if (err) {
                         res.json({ success: false, message: 'Failed to invite user', error:err});
@@ -63,18 +56,19 @@ router.post("/", function(req, res) {
                         var mailOptions = {
                           from: 'youremail@gmail.com',
                           to: req.body.email,
-                          subject: "Email verification require",
+                          subject: "You are invited by "+aeml,
                           text: 'That was easy!',
                           html:'<p>Please click below the link</p><a href="'+path+'">Verify Email</a>'
                         };
 
                         transporter.sendMail(mailOptions, function(error, info){
-                          if (error) {
-                            console.log(error);
-                          } else {
-                                res.json({ success: true, message: 'Invitation to '+eml+' send successfully', flag:false});
-                              console.log('Email sent: ' + info.response);
-                          }
+                            if (error) {
+                                console.log(error);
+                            } 
+                            else {
+                                    res.json({ success: true, message: 'Invitation to '+eml+' send successfully', flag:false});
+                                  console.log('Email sent: ' + info.response);
+                              }
                         });
                     }                
                  }) 
@@ -82,12 +76,6 @@ router.post("/", function(req, res) {
              })
             }
          })
-       
-        }
-       else{
-            
-       }
-     })
 })
 router.post("/resend", function(req, res) {
     var email = req.body.email;
@@ -101,7 +89,7 @@ router.post("/resend", function(req, res) {
             var mailOptions = {
               from: 'youremail@gmail.com',
               to: req.body.email,
-              subject: "Email verification require",
+              subject: "Please complete your registration",
               text: 'That was easy!',
               html:'<p>Please click below the link</p><a href="'+path+'">Verify Email</a>'
             };
@@ -111,7 +99,7 @@ router.post("/resend", function(req, res) {
                 console.log(error);
               } else {
                 console.log('Email sent: ' + info.response);
-                res.send('Confirmation email send successfully');
+                res.send(email+' reinvited successfully');
               }
             });
          }
