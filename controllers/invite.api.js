@@ -8,8 +8,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+     user: 'ss4u.team.node@gmail.com',
+    pass: 'Node Pass797'
   }
 });
 router.post("/", function(req, res) {
@@ -21,7 +21,7 @@ router.post("/", function(req, res) {
     obj.token = hat();
     obj.status = false;
     obj.type = req.body.type;
-    console.log(aeml)
+  //  console.log("fsdf"+aeml)
    
     //var myquery = { email:  aeml};
     var myquery1 = { email:  eml};

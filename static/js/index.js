@@ -254,7 +254,7 @@ function inviteUser(){
     var obj = new Object();
     obj.type = document.getElementById('invite_type').value;
     obj.email =document.getElementById('invite_email').value;
-    obj.aemail =email;
+    obj.aemail =localStorage.getItem('email');
     var eml = obj.email;
     //alert(email);
     var ajaxRequest = new XMLHttpRequest();
