@@ -158,7 +158,7 @@ body {
   color: gray;
 }
 .bottom_wrapper .send_message {
-  width: 140px;
+  width: 100px;
   height: 50px;
   display: inline-block;
   border-radius: 50px;

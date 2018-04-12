@@ -20,15 +20,8 @@ function randomColor(){
     }
 }
 socket.on("userList",function(userName,color){
-    //alert(userName); 
     //var user = document.getElementById("users");
     var str = '<center><li style="color:'+color+'">'+userName+' Connected</li></center>';
-    $("#oList").append(str);
-})
-socket.on("disconnec",function(userName,color){
-    //alert(userName); 
-    //var user = document.getElementById("users");
-    var str = '<center><li style="color:'+color+'">'+userName+' Disconnected</li></center>';
     $("#oList").append(str);
 })
 function connectUser(userName){
@@ -39,7 +32,11 @@ function connectUser(userName){
 function sendMessage(){
     var message = document.getElementById('message').value;
     socket.emit('sendMessage',localStorage.getItem('name'),message,color);
-      document.getElementById('message').value = "";
+    document.getElementById('message').value = "";
+  }
+function sendImgMsg(imgSrc){
+   // alert(decodeURIComponent(imgSrc))
+    socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
   }
 socket.on("displayMsg",function(userName,message,color){
     //console.log(userName); 
@@ -54,6 +51,26 @@ socket.on("displayMsg",function(userName,message,color){
         $("#oList").append(str);
     }
 })
+socket.on("displayImg",function(userName,img,color){
+    console.log(userName); 
+    if(userC==userName)
+    {
+        var timestamp = new Date().getUTCMilliseconds();
+        var str = '<li style="color:'+color+'; text-align: right;"><p><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</p</li>';
+        $("#oList").append(str);
+        var Img = document.getElementById(timestamp);
+        Img.src = decodeURIComponent(imageData);
+     
+    }
+    else
+    {
+       var timestamp = new Date().getUTCMilliseconds();
+        var str = '<li style="color:'+color+'; text-align: left;"><p>'+userName+' : <img id="'+timestamp+'" width="300px" height="200px" align="middle"></p</li>';
+        $("#oList").append(str);
+        var Img = document.getElementById(timestamp);
+        Img.src = decodeURIComponent(imageData);
+    }
+})
 $(window).on('keydown', function(e) {
   if (e.which == 13) {
     sendMessage();
@@ -65,7 +82,12 @@ window.onload = function() {
        CloseInput()
     }
     else{
-        showAdmin();
+        if(localStorage.getItem('admin')=="Admin"){
+            showAdmin();
+        }
+        else{
+            showNonAdmin();
+        }
         connectUser(localStorage.getItem('name'));
     }
 }
@@ -82,9 +104,9 @@ function createOList(obj){
 function getUserList(){
       var ajaxRequest = new XMLHttpRequest();
     if (ajaxRequest) {
-			ajaxRequest.onreadystatechange = ajaxResponse;
-			ajaxRequest.open("GET", "api/user/"); // Where?
-			ajaxRequest.send(null);
+            ajaxRequest.onreadystatechange = ajaxResponse;
+            ajaxRequest.open("GET", "api/user/"); // Where?
+            ajaxRequest.send(null);
     }
 
     function ajaxResponse() {
@@ -160,17 +182,17 @@ function requestForDelete(id){
    var choice =  confirm("Are you sure, you want to delete this record")
    if (choice == true) {
        deleteRecord(id);
-    }  			
+    }           
 }
 
 function deleteRecord(id){
     var ajaxRequest = new XMLHttpRequest();
-	if (ajaxRequest) 
+    if (ajaxRequest) 
     {
         ajaxRequest.onreadystatechange = ajaxResponse;
         ajaxRequest.open("DELETE", "/api/user/"+id);
         ajaxRequest.send(null);
-	}
+    }
     function ajaxResponse() {//This gets called when the readyState changes.
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
@@ -187,11 +209,11 @@ function deleteRecord(id){
 
 function updateRecord(id){
     var ajaxRequest = new XMLHttpRequest();
-	if (ajaxRequest) {
+    if (ajaxRequest) {
         ajaxRequest.onreadystatechange = ajaxResponse;
         ajaxRequest.open("GET", "/api/user/"+id);
         ajaxRequest.send(null);
-	}
+    }
     function ajaxResponse() {//This gets called when the readyState changes.
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
@@ -210,12 +232,12 @@ function login(){
     document.getElementById('login_pass').value = "";
     document.getElementById('login_email').value = "";
     var ajaxRequest = new XMLHttpRequest();
-	if (ajaxRequest) {
+    if (ajaxRequest) {
         ajaxRequest.onreadystatechange = ajaxResponse;
         ajaxRequest.open("POST", "/api/user/login");
         ajaxRequest.setRequestHeader("Content-Type", "application/json");
         ajaxRequest.send(JSON.stringify(obj));
-	}
+    }
     function ajaxResponse() {//This gets called when the readyState changes.
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
@@ -235,12 +257,20 @@ function afterLogin(obj){
             email = data.data.email;
             localStorage.setItem('email', email);
             localStorage.setItem('name', data.data.name);
+            localStorage.setItem('admin', "Admin");
             alert(data.message);
             showAdmin();
             connectUser(data.data.name);
         }
         else{
-             alert("Non Admin")
+            email = data.data.email;
+            localStorage.setItem('email', email);
+            localStorage.setItem('name', data.data.name);
+            localStorage.setItem('admin', "Non Admin");
+            alert(data.message);
+            showNonAdmin();
+            connectUser(data.data.name);
+           
         }
     }
     else{
@@ -254,16 +284,16 @@ function inviteUser(){
     var obj = new Object();
     obj.type = document.getElementById('invite_type').value;
     obj.email =document.getElementById('invite_email').value;
-    obj.aemail =localStorage.getItem('email');
+    obj.aemail =email;
     var eml = obj.email;
     //alert(email);
     var ajaxRequest = new XMLHttpRequest();
-	if (ajaxRequest) {
+    if (ajaxRequest) {
         ajaxRequest.onreadystatechange = ajaxResponse;
         ajaxRequest.open("POST", "/api/invite/");
         ajaxRequest.setRequestHeader("Content-Type", "application/json");
         ajaxRequest.send(JSON.stringify(obj));
-	}
+    }
     function ajaxResponse() {//This gets called when the readyState changes.
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
@@ -295,12 +325,12 @@ function inviteAgain(eml){
     var obj = new Object();
     obj.email =eml;
     var ajaxRequest = new XMLHttpRequest();
-	if (ajaxRequest) {
+    if (ajaxRequest) {
         ajaxRequest.onreadystatechange = ajaxResponse;
         ajaxRequest.open("POST", "/api/invite/resend");
         ajaxRequest.setRequestHeader("Content-Type", "application/json");
         ajaxRequest.send(JSON.stringify(obj));
-	}
+    }
     function ajaxResponse() {//This gets called when the readyState changes.
         if(ajaxRequest.readyState != 4){
             console.log("its in process")
@@ -381,7 +411,16 @@ function showChat(){
 function showInvite(){
     $("#invite").show();
     $("#users").hide();
-    $("#chatContainer").hide();
+    $("#chatContainer").hide();   
+}
+function showNonAdmin(){
+    $("#formLogin").hide();
+    $("#afterLogin").show();
+    $("#chatContainer").show();
+     $("#chat_window").show();
+    $("#invite").hide();
+    $("#users").hide();
+    $(".dd").hide();
     
 }
 //for chat.....
@@ -389,3 +428,31 @@ function logout(){
     localStorage.clear();
     onload();
 }
+
+$("#upfile1").click(function () {
+    $("#file1").trigger('click');
+});
+
+var imageData="";
+$(function () {
+    $(":file").change(function () {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            var totalBytes = this.files[0].size
+            var _size = Math.floor(totalBytes/1000);
+             if(_size<500){
+                  reader.onload = imageIsLoaded;
+                }else{
+                    alert("Image size uploaded should not exceed 2 MB")
+                 }
+             reader.readAsDataURL(this.files[0]);
+        }
+    });
+});
+
+function imageIsLoaded(e) {
+    imageData = e.target.result
+    sendImgMsg(encodeURIComponent(imageData))
+    console.log(e.target.result)
+};
+

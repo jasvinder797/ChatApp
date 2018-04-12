@@ -32,6 +32,12 @@ io.on('connection', function (socket) {
        socket.emit('displayMsg', userName,message,color);
        socket.broadcast.emit('displayMsg', userName,message,color)
      })
+    socket.on('sendImgMsg',function(userName,imgSrc,color)
+     {
+       //console.log(imgSrc); 
+       socket.emit('displayImg', userName,imgSrc,color);
+       socket.broadcast.emit('displayImg',  userName,imgSrc,color)
+     })
      socket.on('disconnect', function(){
 	 console.log("disconnect");
         socket.emit('disconnec', u,clr);
