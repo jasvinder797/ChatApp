@@ -2,63 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Array CRUD</title>
-  <style>
-        img#upfile1 {
-            height: 50px;
-      }
-     
-      #loginform_container,#form_container,#invite_container{
-              width: 60%;
-            padding: 1% 5% 5% 5%;
-            margin: 0 auto;
-            height: auto;
-            border: 1px solid #f3e2e2;
-            box-shadow: 9px 9px 9px 5px #dac9c9;
-      }
-      #show
-      {
-          text-align: center;
-          padding-top: 2%;
-      }
-      #formLogin,#addEmp, #editor,#afterLogin
-      {
-          padding-top: 5%;
-      }
-      .test
-      {
-        margin-right: 10px;   
-      }
-      #tt
-      {
-          text-align: center;
-          padding: 7px;
-      }
-      table, th, td {
-        border: 1px solid #e2e1ec;
-        
-      }
-      th
-      {
-          background: #e9e9f1;
-      }
-      table
-      {
-            text-align: center;
-          font-size: 17px;
-          width: 100%
-      }
-    input[type='submit'], button, [aria-label]{
-      cursor: pointer;
-    }
-    #spoiler{
-      display: none;
-    }
-      .equal-width td {   width: 20%; 
-        text-align: center;
-          
-      }
-  </style>
+  <title>Chat App || Node</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/style.css" rel="stylesheet" id="bootstrap-css">
@@ -150,30 +94,37 @@
             </div>
         </div>
         <div id="chatContainer" class="col-sm-12">
+            <div class="col-sm-4" id="userList">
+                <ul id="userListOnline">
+                   
+                </ul>
+            </div>
+            <div class="col-sm-8">
                 <div class="chat_window" hidden id="chat_window">
-                    <div class="top_menu">
-                        <div class="buttons">
-                            <div class="button close"></div>
-                            <div class="button minimize"></div>
-                            <div class="button maximize"></div>
-                        </div><div class="title">Chat</div>
+                        <div class="top_menu">
+                            <div class="buttons">
+                                <div class="button close"></div>
+                                <div class="button minimize"></div>
+                                <div class="button maximize"></div>
+                            </div><div class="title">Chat</div>
+                        </div>
+                        <ul class="messages" id="oList">
+                        </ul>
+                        <div class="bottom_wrapper clearfix">
+                            <div class="message_input_wrapper col-sm-8">
+                                <input class="message_input" placeholder="Type your message here..." id="message"/>
+                            </div>
+                            <div class="attatchfile col-sm-1">
+                                <input type="file" id="file1" name="image" accept="image/*" capture style="display:none"/>
+                                <img src="http://macgroup.org/blog/wp-content/uploads/2011/10/iphone-camera-icon-150x150.jpg" id="upfile1" style="cursor:pointer"/>
+                            </div>
+                            <div class="send_message col-sm-3">
+                                <div class="icon"></div>
+                                <button id="btn" class="btn btn-info" onclick="sendMessage();">Send</button>
+                            </div>
+                        </div>
                     </div>
-                    <ul class="messages" id="oList">
-                    </ul>
-                    <div class="bottom_wrapper clearfix">
-                        <div class="message_input_wrapper col-sm-8">
-                            <input class="message_input" placeholder="Type your message here..." id="message"/>
-                        </div>
-                        <div class="attatchfile col-sm-1">
-                            <input type="file" id="file1" name="image" accept="image/*" capture style="display:none"/>
-                            <img src="http://macgroup.org/blog/wp-content/uploads/2011/10/iphone-camera-icon-150x150.jpg" id="upfile1" style="cursor:pointer"/>
-                        </div>
-                        <div class="send_message col-sm-3">
-                            <div class="icon"></div>
-                            <button id="btn" class="btn btn-info" onclick="sendMessage();">Send</button>
-                        </div>
-                    </div>
-                </div>
+            </div>
         </div>
     </div>
 <script src="js/index.js"></script>

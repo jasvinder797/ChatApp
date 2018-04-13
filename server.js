@@ -11,26 +11,40 @@ var io = require('socket.io')(server);
 app.use(cors());
 // parse application/json 
 app.use(bodyParser.json());
-
+//array to store connected users
+var onlineUsers = [];
 // setting static files location './app' for angular app html and js
 app.use(express.static(path.join(__dirname, 'static')));
 //for socket
 io.on('connection', function (socket) {
     console.log("connected");
-    var u = "", clr = "";
+    var u = "", clr = "",id="";
      socket.on('login',function(userName,color)
      {
         console.log('connectd'+userName); 
-        socket.emit('userList', userName,color);
         u = userName;
         clr = color; 
-        socket.broadcast.emit('userList', userName,color)
+        id = socket.id; 
+        var obj = new Object();
+        obj.id=socket.id;
+        obj.name=userName;
+        obj.color=color;
+        onlineUsers.push(obj);
+         console.log(onlineUsers)
+         socket.emit('userList', userName,color,id,onlineUsers);
+        socket.broadcast.emit('userList', userName,color,id,onlineUsers)
      })
      socket.on('sendMessage',function(userName,message,color)
      {
-       console.log("send"); 
-       socket.emit('displayMsg', userName,message,color);
-       socket.broadcast.emit('displayMsg', userName,message,color)
+       console.log(id+"send"); 
+       socket.emit('displayMsg', userName,message,color,id);
+       socket.broadcast.emit('displayMsg', userName,message,color,id)
+     })
+    socket.on('sendToIndividual',function(data)
+     {
+        //console.log(data.toId)
+        socket.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
+        socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
     socket.on('sendImgMsg',function(userName,imgSrc,color)
      {
@@ -39,9 +53,12 @@ io.on('connection', function (socket) {
        socket.broadcast.emit('displayImg',  userName,imgSrc,color)
      })
      socket.on('disconnect', function(){
-	 console.log("disconnect");
-        socket.emit('disconnec', u,clr);
-        socket.broadcast.emit('disconnec', u,clr)
+        var idIndex = onlineUsers.indexOf(id);
+        console.log(id);
+        onlineUsers.splice(idIndex, 1);
+        console.log(onlineUsers)
+        socket.emit('out', u,clr,onlineUsers);
+        socket.broadcast.emit('out', u,clr,onlineUsers)
     })	
 })
 // setting static files location './node_modules' for libs like angular, bootstrap

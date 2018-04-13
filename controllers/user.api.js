@@ -8,8 +8,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+    user: 'ss4u.team.node@gmail.com',
+    pass: 'Node Pass797'
   }
 });
 router.post("/register", function(req, res) {
@@ -51,7 +51,8 @@ router.post("/register", function(req, res) {
                             return;
                         }
                         else{
-                            var path = "https://localhost:8000/everify.html?id="+obj.token;
+                            var path = "https://chatapp797.herokuapp.com/everify.html?id="+obj.token;
+                            //var path = "https://localhost:8000/everify.html?id="+obj.token;
                             var mailOptions = {
                               from: 'youremail@gmail.com',
                               to: obj.email,

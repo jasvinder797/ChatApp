@@ -8,8 +8,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+    user: 'ss4u.team.node@gmail.com',
+    pass: 'Node Pass797'
   }
 });
 router.post("/", function(req, res) {
@@ -52,7 +52,8 @@ router.post("/", function(req, res) {
                         return;
                     }
                     else{
-                        var path = "https://localhost:8000/register.html?id="+model.token;
+                        //var path = "https://localhost:8000/register.html?id="+model.token;
+                        var path = "https://chatapp797.herokuapp.com/register.html?id="+model.token;
                         var mailOptions = {
                           from: 'youremail@gmail.com',
                           to: req.body.email,
@@ -85,7 +86,8 @@ router.post("/resend", function(req, res) {
              res.send(err);
          }
          else if(result){
-            var path = "https://localhost:8000/register.html?id="+result.token;
+            var path = "https://chatapp797.herokuapp.com/register.html?id="+model.token;
+            //var path = "https://localhost:8000/register.html?id="+result.token;
             var mailOptions = {
               from: 'youremail@gmail.com',
               to: req.body.email,

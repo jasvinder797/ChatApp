@@ -1,8 +1,9 @@
 console.log = function(){};  /*disable all console log */
 localStorage.setItem(email, "");
-var email="", userC ="";
+var email="", userID ="";
 var socket = io.connect('');
-var color = "";
+var color = "", sendTo="";
+var imgSelected=0;
 var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#00B3E6', 
      '#3366E6', '#999966', '#99FF99', '#B34D4D',
       '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
@@ -19,28 +20,66 @@ function randomColor(){
         return colorArray[randomIndex];
     }
 }
-socket.on("userList",function(userName,color){
+socket.on("userList",function(userName,color,getid,ulist){
     //var user = document.getElementById("users");
     var str = '<center><li style="color:'+color+'">'+userName+' Connected</li></center>';
+    userID = getid;
+    var str1 = "";
+    for(var i=0; i<ulist.length; i++){
+        var id =ulist[0].id;
+        str1 = '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
+    }
     $("#oList").append(str);
+    $("#userListOnline").append(str1);
 })
+function setID(id){
+   sendTo = id;
+    alert(id)
+}
+
 function connectUser(userName){
     color = randomColor();
-    userC = userName;
     socket.emit('login',userName,color);
 }  
 function sendMessage(){
-    var message = document.getElementById('message').value;
-    socket.emit('sendMessage',localStorage.getItem('name'),message,color);
-    document.getElementById('message').value = "";
+    // alert(decodeURIComponent(imgSrc))
+     var message = document.getElementById('message').value;
+    if(imgSelected==1){
+        var imgSrc = $('#myImg').attr('src');
+       socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color); 
+        $('#tempDiv').remove();
+        imgSelected=0;
+    }
+    else{
+        if(sendTo==""){
+            socket.emit('sendMessage',localStorage.getItem('name'),message,color);
+        }
+        else{
+            socket.emit('sendToIndividual',{toId: sendTo, from:localStorage.getItem('name'),msg:message,clr:color});
+        }
+    }
+     document.getElementById('message').value = "";
   }
 function sendImgMsg(imgSrc){
    // alert(decodeURIComponent(imgSrc))
     socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
   }
-socket.on("displayMsg",function(userName,message,color){
-    //console.log(userName); 
-    if(userC==userName)
+socket.on("sendMsg",function(data){
+    alert(data.msg)
+    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.msg+' : '+data.from+'</li>';
+    $("#oList").append(str);
+   
+})
+socket.on("out",function(data){
+    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.msg+' : '+data.from+'</li>';
+    $("#oList").append(str);
+   
+})
+socket.on("displayMsg",function(userName,message,color,id){
+    //alert(id); 
+//    alert(id)
+//    alert(userID)
+    if(userID==id)
     {
         var str = '<li style="color:'+color+'; text-align: right;">'+message+' : '+userName+'</li>';
         $("#oList").append(str);
@@ -56,7 +95,7 @@ socket.on("displayImg",function(userName,img,color){
     if(userC==userName)
     {
         var timestamp = new Date().getUTCMilliseconds();
-        var str = '<li style="color:'+color+'; text-align: right;"><p><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</p</li>';
+        var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</li>';
         $("#oList").append(str);
         var Img = document.getElementById(timestamp);
         Img.src = decodeURIComponent(imageData);
@@ -449,10 +488,23 @@ $(function () {
         }
     });
 });
-
 function imageIsLoaded(e) {
     imageData = e.target.result
-    sendImgMsg(encodeURIComponent(imageData))
-    console.log(e.target.result)
+    var str = '<center><div id="tempDiv" class="container" style="width:300px; height:200px;"><img id="myImg" width="300px" height="200px" align="middle"><div class="centered">Click Send to send</div> <span class="cancel" onclick="removeDiv()">X</span></div></center>';
+    $("#oList").append(str);
+    var Img = document.getElementById("myImg");
+    Img.src = e.target.result;
+    imgSelected=1;
+    
 };
+function removeDiv(){
+     $('#tempDiv').remove();
+    imgSelected=0;
+}
+
+//function imageIsLoaded(e) {
+//    imageData = e.target.result
+//    sendImgMsg(encodeURIComponent(imageData))
+//    console.log(e.target.result)
+//};
 
