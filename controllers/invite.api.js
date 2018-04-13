@@ -86,7 +86,7 @@ router.post("/resend", function(req, res) {
              res.send(err);
          }
          else if(result){
-            var path = "https://chatapp797.herokuapp.com/register.html?id="+model.token;
+            var path = "https://chatapp797.herokuapp.com/register.html?id="+result.token;
             //var path = "https://localhost:8000/register.html?id="+result.token;
             var mailOptions = {
               from: 'youremail@gmail.com',
