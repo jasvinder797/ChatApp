@@ -65,8 +65,7 @@ function sendImgMsg(imgSrc){
     socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
   }
 socket.on("sendMsg",function(data){
-    alert(data.msg)
-    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.msg+' : '+data.from+'</li>';
+    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
     $("#oList").append(str);
    
 })
@@ -323,7 +322,7 @@ function inviteUser(){
     var obj = new Object();
     obj.type = document.getElementById('invite_type').value;
     obj.email =document.getElementById('invite_email').value;
-    obj.aemail =email;
+    obj.aemail =localStorage.getItem('email');
     var eml = obj.email;
     //alert(email);
     var ajaxRequest = new XMLHttpRequest();
