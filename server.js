@@ -49,8 +49,8 @@ io.on('connection', function (socket) {
     socket.on('sendImgMsg',function(userName,imgSrc,color)
      {
        //console.log(imgSrc); 
-       socket.emit('displayImg', userName,imgSrc,color);
-       socket.broadcast.emit('displayImg',  userName,imgSrc,color)
+       socket.emit('displayImg', userName,imgSrc,color,id);
+       socket.broadcast.emit('displayImg',  userName,imgSrc,color,id)
      })
      socket.on('disconnect', function(){
         var idIndex = onlineUsers.indexOf(id);

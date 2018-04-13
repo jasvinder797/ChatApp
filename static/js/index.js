@@ -90,9 +90,9 @@ socket.on("displayMsg",function(userName,message,color,id){
         $("#oList").append(str);
     }
 })
-socket.on("displayImg",function(userName,img,color){
+socket.on("displayImg",function(userName,img,color,id){
     console.log(userName); 
-    if(userC==userName)
+    if(userID==id)
     {
         var timestamp = new Date().getUTCMilliseconds();
         var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</li>';
@@ -433,7 +433,8 @@ function showAdmin(){
     $("#formLogin").hide();
     $("#afterLogin").show();
     $("#users").hide();
-    
+    $("#userList").hide();
+     $("#invite").show();
 }
 function showUser(){
     $("#invite").hide();
@@ -446,6 +447,7 @@ function showChat(){
     $("#users").hide();
      $("#chatContainer").show();
      $("#chat_window").show();
+    $("#userList").show();
 }
 function showInvite(){
     $("#invite").show();
