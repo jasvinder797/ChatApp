@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'static')));
 //for socket
 io.on('connection', function (socket) {
     console.log("connected");
-    var u = "", clr = "",id="";
+    var u = "", clr = "", id="", i=0;
      socket.on('login',function(userName,color)
      {
         console.log('connectd'+userName); 
@@ -42,7 +42,7 @@ io.on('connection', function (socket) {
      })
     socket.on('sendToIndividual',function(data)
      {
-        //console.log(data.toId)
+        console.log(data.from)
         socket.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
         socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
@@ -53,9 +53,9 @@ io.on('connection', function (socket) {
        socket.broadcast.emit('displayImg',  userName,imgSrc,color,id)
      })
      socket.on('disconnect', function(){
-        var idIndex = onlineUsers.indexOf(id);
-        console.log(id);
-        onlineUsers.splice(idIndex, 1);
+        var index = onlineUsers.findIndex(x => x.id==id);
+        console.log("index "+index);
+        onlineUsers.splice(index, 1);
         console.log(onlineUsers)
         socket.emit('out', u,clr,onlineUsers);
         socket.broadcast.emit('out', u,clr,onlineUsers)
