@@ -50,11 +50,11 @@ function sendMessage(){
     }
     else{
         if(sendTo==""){
-            socket.emit('sendMessage',localStorage.getItem('name'),message,color);
+            socket.emit('sendMessage',localStorage.getItem('email'),localStorage.getItem('name'),message,color);
         }
         else{
              alert("individual")
-            socket.emit('sendToIndividual',{toId: sendTo, from:localStorage.getItem('name'),msg:message,clr:color});
+            socket.emit('sendToIndividual',{toId: sendTo, from:localStorage.getItem('name'),fromEmail:localStorage.getItem('email'),msg:message,clr:color});
         }
     }
      document.getElementById('message').value = "";
@@ -65,6 +65,7 @@ function sendImgMsg(imgSrc){
   }
 socket.on("sendMsg",function(data){
     var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
+    alert("hello")
     $("#oList").append(str);
    
 })
@@ -77,11 +78,8 @@ socket.on("out",function(ulist){
     document.getElementById('userListOnline').innerHTML = str;
    
 })
-socket.on("displayMsg",function(userName,message,color,id){
-    //alert(id); 
-//    alert(id)
-//    alert(userID)
-    if(userID==id)
+socket.on("displayMsg",function(email,userName,message,color,id){
+    if(email==localStorage.getItem('email'))
     {
         var str = '<li style="color:'+color+'; text-align: right;">'+message+' : '+userName+'</li>';
         $("#oList").append(str);
@@ -201,7 +199,7 @@ function saveRecord(){
 function createList(obj){
 
      var data = JSON.parse(obj);
-    //alert(data.data[0].id);
+   // alert(obj);
      /*Convert string data to JSON Oject*/
      var rowString ="";
      for(var i=0;i<data.data.length;i++){
