@@ -22,24 +22,22 @@ function randomColor(){
 }
 socket.on("userList",function(userName,color,getid,ulist){
     //var user = document.getElementById("users");
-    var str = '<center><li style="color:'+color+'">'+userName+' Connected</li></center>';
     userID = getid;
     var str1 = "";
     for(var i=0; i<ulist.length; i++){
         var id =ulist[0].id;
         str1 = '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
     }
-    $("#oList").append(str);
-    $("#userListOnline").append(str1);
+    document.getElementById("userListOnline").innerHTML  = str1;
 })
 function setID(id){
    sendTo = id;
     alert(id)
 }
 
-function connectUser(userName){
+function connectUser(userName,email){
     color = randomColor();
-    socket.emit('login',userName,color);
+    socket.emit('login',userName,email,color);
 }  
 function sendMessage(){
     // alert(decodeURIComponent(imgSrc))
@@ -70,9 +68,13 @@ socket.on("sendMsg",function(data){
     $("#oList").append(str);
    
 })
-socket.on("out",function(data){
-    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.msg+' : '+data.from+'</li>';
-    $("#oList").append(str);
+socket.on("out",function(ulist){
+    var str = "";
+    for(var i=0; i<ulist.length; i++){
+        var id =ulist[0].id;
+        str = '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
+    }
+    document.getElementById('userListOnline').innerHTML = str;
    
 })
 socket.on("displayMsg",function(userName,message,color,id){
@@ -127,7 +129,7 @@ window.onload = function() {
         else{
             showNonAdmin();
         }
-        connectUser(localStorage.getItem('name'));
+        connectUser(localStorage.getItem('name'),localStorage.getItem('email'));
     }
 }
 function createOList(obj){
@@ -299,7 +301,7 @@ function afterLogin(obj){
             localStorage.setItem('admin', "Admin");
             alert(data.message);
             showAdmin();
-            connectUser(data.data.name);
+            connectUser(data.data.name,email);
         }
         else{
             email = data.data.email;
@@ -308,7 +310,7 @@ function afterLogin(obj){
             localStorage.setItem('admin', "Non Admin");
             alert(data.message);
             showNonAdmin();
-            connectUser(data.data.name);
+            connectUser(data.data.name,email);
            
         }
     }

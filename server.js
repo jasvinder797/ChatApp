@@ -17,22 +17,29 @@ var onlineUsers = [];
 app.use(express.static(path.join(__dirname, 'static')));
 //for socket
 io.on('connection', function (socket) {
-    console.log("connected");
     var u = "", clr = "", id="", i=0;
-     socket.on('login',function(userName,color)
+     socket.on('login',function(userName,email,color)
      {
-        console.log('connectd'+userName); 
-        u = userName;
-        clr = color; 
-        id = socket.id; 
-        var obj = new Object();
-        obj.id=socket.id;
-        obj.name=userName;
-        obj.color=color;
-        onlineUsers.push(obj);
-         console.log(onlineUsers)
-         socket.emit('userList', userName,color,id,onlineUsers);
-        socket.broadcast.emit('userList', userName,color,id,onlineUsers)
+         console.log('connectd'+userName); 
+         
+            var index = onlineUsers.findIndex(x => x.email==email); 
+            console.log(onlineUsers)
+            if(index<0){
+                console.log('connectd'+userName); 
+                u = userName;
+                clr = color; 
+                id = socket.id;
+                var obj = new Object();
+                obj.id=socket.id;
+                obj.name=userName;
+                obj.email=email;
+                obj.color=color;
+                onlineUsers.push(obj);
+            }
+            console.log(onlineUsers)
+            socket.emit('userList', userName,color,id,onlineUsers);
+            socket.broadcast.emit('userList', userName,color,id,onlineUsers)
+      
      })
      socket.on('sendMessage',function(userName,message,color)
      {
@@ -57,8 +64,8 @@ io.on('connection', function (socket) {
         console.log("index "+index);
         onlineUsers.splice(index, 1);
         console.log(onlineUsers)
-        socket.emit('out', u,clr,onlineUsers);
-        socket.broadcast.emit('out', u,clr,onlineUsers)
+        socket.emit('out', onlineUsers);
+        socket.broadcast.emit('out', onlineUsers)
     })	
 })
 // setting static files location './node_modules' for libs like angular, bootstrap
