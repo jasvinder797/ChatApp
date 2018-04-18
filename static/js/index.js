@@ -32,7 +32,25 @@ socket.on("userList",function(ulist){
 function setID(id){
    sendTo = id;
 }
+var typing = false;
+var timeout = undefined;
 
+function timeoutFunction(){
+  typing = false;
+  socket.emit(noLongerTypingMessage);
+}
+
+function onKeyDownNotEnter(){
+  if(typing == false) {
+    typing = true
+    socket.emit(typingMessage);
+    timeout = setTimeout(timeoutFunction, 5000);
+  } else {
+    clearTimeout(timeout);
+    timeout = setTimeout(timeoutFunction, 5000);
+  }
+
+}
 function connectUser(userName,email){
     color = randomColor();
     socket.emit('login',userName,email,color);
@@ -69,6 +87,19 @@ function sendImgMsg(imgSrc){
     socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
   }
 socket.on("sendMsg",function(data){
+  
+    if(data.email==localStorage.getItem('email'))
+    {
+        var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : '+data.from+'</li>';
+    }
+    else
+    {
+        var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
+    }
+    $("#oList").append(str);
+   
+})
+socket.on("kkk",function(data){
   
     if(data.email==localStorage.getItem('email'))
     {

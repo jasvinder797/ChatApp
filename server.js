@@ -18,8 +18,8 @@ app.use(express.static(path.join(__dirname, 'static')));
 //for socket
 io.on('connection', function (socket) {
     var u = "", clr = "", id="", i=0;
-     socket.on('login',function(userName,email,color)
-     {
+      socket.broadcast.emit('userList',onlineUsers)
+      socket.on('login',function(userName,email,color){
           u = userName;
           clr = color; 
           id = socket.id;
@@ -50,18 +50,20 @@ io.on('connection', function (socket) {
      })
     socket.on('sendToIndividual',function(data)
      {
-        socket.emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr},data.toId);
-        socket.broadcast.emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr},data.toId);
+        console.log(socket.id)
+//        socket.to(socket.id).emit('kkk',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
+//        socket.broadcast.to(socket.id).emit('kkk',{msg:data.msg,from:data.from,clr:data.clr});
+        
+        socket.to(socket.id).emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
+        socket.broadcast.to(socket.id).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
     socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)
      {
-       //console.log(imgSrc); 
        socket.emit('displayImg', fromMail,userName,imgSrc,color,id);
        socket.broadcast.emit('displayImg', fromMail,userName,imgSrc,color,id)
      })
     socket.on('sendImgMsgInd',function(fromMail,userName,imgSrc,color)
      {
-       //console.log(imgSrc); 
        socket.emit('displayImgInd',fromMail, userName,imgSrc,color,id);
        socket.broadcast.emit('displayImgInd', fromMail, userName,imgSrc,color,id)
      })
