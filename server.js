@@ -47,8 +47,6 @@ io.on('connection', function (socket) {
     socket.on('sendToIndividual',function(data)
      {
         console.log(socket.id)
-        socket.broadcast.to(socket.id).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
-        
         socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
     socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)

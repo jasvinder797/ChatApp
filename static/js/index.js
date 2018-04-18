@@ -35,22 +35,6 @@ function setID(id){
 var typing = false;
 var timeout = undefined;
 
-function timeoutFunction(){
-  typing = false;
-  socket.emit(noLongerTypingMessage);
-}
-
-function onKeyDownNotEnter(){
-  if(typing == false) {
-    typing = true
-    socket.emit(typingMessage);
-    timeout = setTimeout(timeoutFunction, 5000);
-  } else {
-    clearTimeout(timeout);
-    timeout = setTimeout(timeoutFunction, 5000);
-  }
-
-}
 function connectUser(userName,email){
     color = randomColor();
     socket.emit('login',userName,email,color);
@@ -534,4 +518,9 @@ function removeDiv(){
      $('#tempDiv').remove();
     imgSelected=0;
 }
-
+$(document).ready(function() {
+ $('#message').bind('copy paste cut',function(e) { 
+ e.preventDefault(); //disable cut,copy,paste
+ alert('cut,copy & paste options are disabled !!');
+ });
+});
