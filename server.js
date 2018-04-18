@@ -20,25 +20,26 @@ io.on('connection', function (socket) {
     var u = "", clr = "", id="", i=0;
      socket.on('login',function(userName,email,color)
      {
-         console.log('connectd'+userName); 
-         
+          u = userName;
+          clr = color; 
+          id = socket.id;
+          console.log('connectd'+id); 
             var index = onlineUsers.findIndex(x => x.email==email); 
-            console.log(onlineUsers)
             if(index<0){
                 console.log('connectd'+userName); 
-                u = userName;
-                clr = color; 
-                id = socket.id;
                 var obj = new Object();
                 obj.id=socket.id;
                 obj.name=userName;
                 obj.email=email;
                 obj.color=color;
+                socket.emit('userList',onlineUsers);
+                socket.broadcast.emit('userList',onlineUsers)
                 onlineUsers.push(obj);
             }
+        
+            socket.emit('userList',onlineUsers);
+            socket.broadcast.emit('userList',onlineUsers)
             console.log(onlineUsers)
-            socket.emit('userList', userName,color,id,onlineUsers);
-            socket.broadcast.emit('userList', userName,color,id,onlineUsers)
       
      })
      socket.on('sendMessage',function(email,userName,message,color)
@@ -49,27 +50,24 @@ io.on('connection', function (socket) {
      })
     socket.on('sendToIndividual',function(data)
      {
-        console.log(data.fromEmail)
-        var index = onlineUsers.findIndex(x => x.email==data.fromEmail);
-       console.log(index)
-//        var strObj = JSON.stringify(onlineUsers[index]);
-//        var senderObj = JSON.parse(strObj)
-//        console.log(senderObj.id)
-//        socket.to(senderObj.id).emit('sendMsg',{email:data.fromEmail, msg:data.msg,from:data.from,clr:data.clr});
-//        socket.broadcast.to(senderObj.id).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
-       
-        socket.to(data.toId).emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
-        socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
+        socket.emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr},data.toId);
+        socket.broadcast.emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr},data.toId);
      })
-    socket.on('sendImgMsg',function(userName,imgSrc,color)
+    socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)
      {
        //console.log(imgSrc); 
-       socket.emit('displayImg', userName,imgSrc,color,id);
-       socket.broadcast.emit('displayImg',  userName,imgSrc,color,id)
+       socket.emit('displayImg', fromMail,userName,imgSrc,color,id);
+       socket.broadcast.emit('displayImg', fromMail,userName,imgSrc,color,id)
+     })
+    socket.on('sendImgMsgInd',function(fromMail,userName,imgSrc,color)
+     {
+       //console.log(imgSrc); 
+       socket.emit('displayImgInd',fromMail, userName,imgSrc,color,id);
+       socket.broadcast.emit('displayImgInd', fromMail, userName,imgSrc,color,id)
      })
      socket.on('disconnect', function(){
-        var index = onlineUsers.findIndex(x => x.id==id);
-        console.log("index "+index);
+        var index = onlineUsers.findIndex(x => x.id==socket.id);
+        console.log("index "+socket.id);
         onlineUsers.splice(index, 1);
         console.log(onlineUsers)
         socket.emit('out', onlineUsers);

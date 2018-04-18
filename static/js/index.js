@@ -1,6 +1,6 @@
 console.log = function(){};  /*disable all console log */
 localStorage.setItem(email, "");
-var email="", userID ="";
+var email="";
 var socket = io.connect('');
 var color = "", sendTo="";
 var imgSelected=0;
@@ -20,13 +20,12 @@ function randomColor(){
         return colorArray[randomIndex];
     }
 }
-socket.on("userList",function(userName,color,getid,ulist){
+socket.on("userList",function(ulist){
     //var user = document.getElementById("users");
-    userID = getid;
     var str1 = "";
     for(var i=0; i<ulist.length; i++){
-        var id =ulist[0].id;
-        str1 = '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
+        var id =ulist[i].id;
+        str1 += '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
     }
     document.getElementById("userListOnline").innerHTML  = str1;
 })
@@ -43,14 +42,23 @@ function sendMessage(){
     // alert(decodeURIComponent(imgSrc))
      var message = document.getElementById('message').value;
     if(imgSelected==1){
-        var imgSrc = $('#myImg').attr('src');
-       socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color); 
-        $('#tempDiv').remove();
-        imgSelected=0;
+         if(sendTo==""){
+            var imgSrc = $('#myImg').attr('src');
+             //alert(imgSrc)
+            socket.emit('sendImgMsg',localStorage.getItem('email'), localStorage.getItem('name'),imgSrc,color); 
+            $('#tempDiv').remove();
+            imgSelected=0;
+         }
+        else{
+            alert("individual")
+            socket.emit('sendImgMsgInd',localStorage.getItem('email'), localStorage.getItem('name'),imgSrc,color); 
+            $('#tempDiv').remove();
+        }
+       
     }
     else{
         if(sendTo==""){
-            socket.emit('sendMessage',localStorage.getItem('email'),localStorage.getItem('name'),message,color);
+            socket.emit('sendMessage',localStorage.getItem('email'), localStorage.getItem('name'),message,color);
         }
         else{
              alert("individual")
@@ -64,8 +72,15 @@ function sendImgMsg(imgSrc){
     socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
   }
 socket.on("sendMsg",function(data){
-    var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
-    alert("hello")
+  
+    if(data.email==localStorage.getItem('email'))
+    {
+        var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : '+data.from+'</li>';
+    }
+    else
+    {
+        var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
+    }
     $("#oList").append(str);
    
 })
@@ -90,15 +105,14 @@ socket.on("displayMsg",function(email,userName,message,color,id){
         $("#oList").append(str);
     }
 })
-socket.on("displayImg",function(userName,img,color,id){
-    console.log(userName); 
-    if(userID==id)
+socket.on("displayImg",function(email,userName,img,color,id){
+    if(email==localStorage.getItem('email'))
     {
         var timestamp = new Date().getUTCMilliseconds();
         var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</li>';
         $("#oList").append(str);
         var Img = document.getElementById(timestamp);
-        Img.src = decodeURIComponent(imageData);
+        Img.src = decodeURIComponent(img);
      
     }
     else
@@ -107,7 +121,7 @@ socket.on("displayImg",function(userName,img,color,id){
         var str = '<li style="color:'+color+'; text-align: left;"><p>'+userName+' : <img id="'+timestamp+'" width="300px" height="200px" align="middle"></p</li>';
         $("#oList").append(str);
         var Img = document.getElementById(timestamp);
-        Img.src = decodeURIComponent(imageData);
+        Img.src = decodeURIComponent(img);
     }
 })
 $(window).on('keydown', function(e) {
@@ -503,10 +517,4 @@ function removeDiv(){
      $('#tempDiv').remove();
     imgSelected=0;
 }
-
-//function imageIsLoaded(e) {
-//    imageData = e.target.result
-//    sendImgMsg(encodeURIComponent(imageData))
-//    console.log(e.target.result)
-//};
 
