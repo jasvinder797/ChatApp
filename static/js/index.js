@@ -78,6 +78,8 @@ function sendMessage(){
         }
         else{
             socket.emit('sendToIndividual',{toId: sendTo, from:localStorage.getItem('name'),fromEmail:localStorage.getItem('email'),msg:message,clr:color});
+            var str = '<li style="color:'+color+'; text-align: right;">'+message+' : Me</li>';
+            $("#oList").append(str);
         }
     }
      document.getElementById('message').value = "";
@@ -90,7 +92,7 @@ socket.on("sendMsg",function(data){
   
     if(data.email==localStorage.getItem('email'))
     {
-        var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : '+data.from+'</li>';
+        var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : Me</li>';
     }
     else
     {
@@ -111,7 +113,7 @@ socket.on("out",function(ulist){
 socket.on("displayMsg",function(email,userName,message,color,id){
     if(email==localStorage.getItem('email'))
     {
-        var str = '<li style="color:'+color+'; text-align: right;">'+message+' : '+userName+'</li>';
+        var str = '<li style="color:'+color+'; text-align: right;">'+message+' : Me</li>';
         $("#oList").append(str);
     }
     else
@@ -124,7 +126,7 @@ socket.on("displayImg",function(email,userName,img,color,id){
     if(email==localStorage.getItem('email'))
     {
         var timestamp = new Date().getUTCMilliseconds();
-        var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : '+userName+'</li>';
+        var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : Me</li>';
         $("#oList").append(str);
         var Img = document.getElementById(timestamp);
         Img.src = decodeURIComponent(img);
