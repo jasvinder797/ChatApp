@@ -31,7 +31,6 @@ socket.on("userList",function(ulist){
 })
 function setID(id){
    sendTo = id;
-    alert(id)
 }
 
 function connectUser(userName,email){
@@ -50,7 +49,6 @@ function sendMessage(){
             imgSelected=0;
          }
         else{
-            alert("individual")
             socket.emit('sendImgMsgInd',localStorage.getItem('email'), localStorage.getItem('name'),imgSrc,color); 
             $('#tempDiv').remove();
         }
