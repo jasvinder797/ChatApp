@@ -51,11 +51,11 @@ io.on('connection', function (socket) {
     socket.on('sendToIndividual',function(data)
      {
         console.log(socket.id)
-//        socket.to(socket.id).emit('kkk',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
+//        socket.to(socket.id).emit('kk',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
 //        socket.broadcast.to(socket.id).emit('kkk',{msg:data.msg,from:data.from,clr:data.clr});
         
-        socket.to(socket.id).emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
-        socket.broadcast.to(socket.id).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
+        socket.to(data.toId).emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
+        socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
     socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)
      {
