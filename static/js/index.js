@@ -99,19 +99,6 @@ socket.on("sendMsg",function(data){
     $("#oList").append(str);
    
 })
-socket.on("kkk",function(data){
-  
-    if(data.email==localStorage.getItem('email'))
-    {
-        var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : '+data.from+'</li>';
-    }
-    else
-    {
-        var str = '<li style="color:'+data.clr+'; text-align: left;">'+data.from+' : '+data.msg+'</li>';
-    }
-    $("#oList").append(str);
-   
-})
 socket.on("out",function(ulist){
     var str = "";
     for(var i=0; i<ulist.length; i++){

@@ -17,30 +17,26 @@ var onlineUsers = [];
 app.use(express.static(path.join(__dirname, 'static')));
 //for socket
 io.on('connection', function (socket) {
-    var u = "", clr = "", id="", i=0;
-      socket.broadcast.emit('userList',onlineUsers)
-      socket.on('login',function(userName,email,color){
-          u = userName;
-          clr = color; 
-          id = socket.id;
-          console.log('connectd'+id); 
+        var u = "", clr = "", id="", i=0;
+        //socket.broadcast.emit('userList',onlineUsers)
+        socket.on('login',function(userName,email,color){
+            u = userName;
+            clr = color; 
+            id = socket.id;
+            // console.log("****"+onlineUsers)
             var index = onlineUsers.findIndex(x => x.email==email); 
             if(index<0){
-                console.log('connectd'+userName); 
+                console.log("****"+index)
                 var obj = new Object();
-                obj.id=socket.id;
-                obj.name=userName;
-                obj.email=email;
-                obj.color=color;
-                socket.emit('userList',onlineUsers);
-                socket.broadcast.emit('userList',onlineUsers)
-                onlineUsers.push(obj);
+                    obj.id=socket.id;
+                    obj.name=userName;
+                    obj.email=email;
+                    obj.color=color;
+                onlineUsers.push(obj); 
+                console.log(onlineUsers)
             }
-        
-            socket.emit('userList',onlineUsers);
-            socket.broadcast.emit('userList',onlineUsers)
-            console.log(onlineUsers)
-      
+        socket.emit('userList',onlineUsers);
+        socket.broadcast.emit('userList',onlineUsers)  
      })
      socket.on('sendMessage',function(email,userName,message,color)
      {
@@ -51,10 +47,9 @@ io.on('connection', function (socket) {
     socket.on('sendToIndividual',function(data)
      {
         console.log(socket.id)
-//        socket.to(socket.id).emit('kk',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
-//        socket.broadcast.to(socket.id).emit('kkk',{msg:data.msg,from:data.from,clr:data.clr});
+//        socket.to(socket.id).emit('kk',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr}); 
+        socket.broadcast.to(socket.id).emit('kkk',{msg:data.msg,from:data.from,clr:data.clr});
         
-        socket.to(data.toId).emit('sendMsg',{email:data.fromEmail,msg:data.msg,from:data.from,clr:data.clr});
         socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
      })
     socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)
@@ -69,8 +64,11 @@ io.on('connection', function (socket) {
      })
      socket.on('disconnect', function(){
         var index = onlineUsers.findIndex(x => x.id==socket.id);
-        console.log("index "+socket.id);
-        onlineUsers.splice(index, 1);
+        console.log("socket Id >>> "+socket.id);
+        console.log("index Id >>> "+index);
+        if(index>=0){
+            onlineUsers.splice(index, 1);
+        }
         console.log(onlineUsers)
         socket.emit('out', onlineUsers);
         socket.broadcast.emit('out', onlineUsers)
