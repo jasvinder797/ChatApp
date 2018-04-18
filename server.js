@@ -47,17 +47,16 @@ io.on('connection', function (socket) {
     socket.on('sendToIndividual',function(data)
      {
         console.log(socket.id)
-        socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr});
+        socket.broadcast.to(data.toId).emit('sendMsg',{msg:data.msg,from:data.from,clr:data.clr,fromEmail:data.fromEmail});
      })
     socket.on('sendImgMsg',function(fromMail,userName,imgSrc,color)
      {
        socket.emit('displayImg', fromMail,userName,imgSrc,color,id);
        socket.broadcast.emit('displayImg', fromMail,userName,imgSrc,color,id)
      })
-    socket.on('sendImgMsgInd',function(fromMail,userName,imgSrc,color)
+    socket.on('sendImgMsgInd',function(data)
      {
-       socket.emit('displayImgInd',fromMail, userName,imgSrc,color,id);
-       socket.broadcast.emit('displayImgInd', fromMail, userName,imgSrc,color,id)
+       socket.broadcast.to(data.toId).emit('displayImgInd', {img:data.img,from:data.from,clr:data.clr,fromEmail:data.fromEmail})
      })
      socket.on('disconnect', function(){
         var index = onlineUsers.findIndex(x => x.id==socket.id);

@@ -25,16 +25,14 @@ socket.on("userList",function(ulist){
     var str1 = "";
     for(var i=0; i<ulist.length; i++){
         var id =ulist[i].id;
-        str1 += '<a  href="javascript:setID(\'' + id + '\')" ><li style="color:'+ulist[i].color+'">'+ulist[i].name+'</li></a>';   
+        str1 += '<a  href="javascript:setID(\'' + id + '\')" ><li id="'+id+'" class="userlistLi" style="color:'+ulist[i].color+'">► '+ulist[i].name+'</li></a>';   
     }
     document.getElementById("userListOnline").innerHTML  = str1;
 })
 function setID(id){
    sendTo = id;
+//   $('#'+id+'').addClass(" selected");
 }
-var typing = false;
-var timeout = undefined;
-
 function connectUser(userName,email){
     color = randomColor();
     socket.emit('login',userName,email,color);
@@ -51,8 +49,14 @@ function sendMessage(){
             imgSelected=0;
          }
         else{
-            socket.emit('sendImgMsgInd',localStorage.getItem('email'), localStorage.getItem('name'),imgSrc,color); 
+            var imgSrc = $('#myImg').attr('src');
+            socket.emit('sendImgMsgInd',{toId: sendTo, from:localStorage.getItem('name'),fromEmail:localStorage.getItem('email'),img:imgSrc,clr:color}); 
             $('#tempDiv').remove();
+            var timestamp = new Date().getUTCMilliseconds();
+            var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : Me</li>';
+            $("#oList").append(str);
+            var Img = document.getElementById(timestamp);
+            Img.src = decodeURIComponent(imageData);
         }
        
     }
@@ -68,13 +72,9 @@ function sendMessage(){
     }
      document.getElementById('message').value = "";
   }
-function sendImgMsg(imgSrc){
-   // alert(decodeURIComponent(imgSrc))
-    socket.emit('sendImgMsg',localStorage.getItem('name'),imgSrc,color);
-  }
 socket.on("sendMsg",function(data){
   
-    if(data.email==localStorage.getItem('email'))
+    if(data.fromEmail==localStorage.getItem('email'))
     {
         var str = '<li style="color:'+data.clr+'; text-align: right;">'+data.msg+' : Me</li>';
     }
@@ -106,9 +106,25 @@ socket.on("displayMsg",function(email,userName,message,color,id){
         $("#oList").append(str);
     }
 })
+socket.on("displayImgInd",function(data){
+    if(data.fromEmail==localStorage.getItem('email')){
+        var timestamp = new Date().getUTCMilliseconds();
+        var str = '<li style="color:'+data.clr+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : Me</li>';
+        $("#oList").append(str);
+        var Img = document.getElementById(timestamp);
+        Img.src = decodeURIComponent(data.img);
+     
+    }
+    else{
+       var timestamp = new Date().getUTCMilliseconds();
+        var str = '<li style="color:'+data.clr+'; text-align: left;"><p>'+data.from+' : <img id="'+timestamp+'" width="300px" height="200px" align="middle"></p</li>';
+        $("#oList").append(str);
+        var Img = document.getElementById(timestamp);
+        Img.src = decodeURIComponent(data.img);
+    }
+})
 socket.on("displayImg",function(email,userName,img,color,id){
-    if(email==localStorage.getItem('email'))
-    {
+    if(email==localStorage.getItem('email')){
         var timestamp = new Date().getUTCMilliseconds();
         var str = '<li style="color:'+color+'; text-align: right;"><img id="'+timestamp+'" width="300px" height="200px" align="middle">  : Me</li>';
         $("#oList").append(str);
@@ -116,8 +132,7 @@ socket.on("displayImg",function(email,userName,img,color,id){
         Img.src = decodeURIComponent(img);
      
     }
-    else
-    {
+    else{
        var timestamp = new Date().getUTCMilliseconds();
         var str = '<li style="color:'+color+'; text-align: left;"><p>'+userName+' : <img id="'+timestamp+'" width="300px" height="200px" align="middle"></p</li>';
         $("#oList").append(str);
