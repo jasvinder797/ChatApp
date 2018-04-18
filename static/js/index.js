@@ -59,7 +59,6 @@ function sendMessage(){
             socket.emit('sendMessage',localStorage.getItem('email'), localStorage.getItem('name'),message,color);
         }
         else{
-             alert("individual")
             socket.emit('sendToIndividual',{toId: sendTo, from:localStorage.getItem('name'),fromEmail:localStorage.getItem('email'),msg:message,clr:color});
         }
     }
