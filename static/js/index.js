@@ -225,7 +225,6 @@ function saveRecord(){
          
   }
 }
-
 function createList(obj){
 
      var data = JSON.parse(obj);
@@ -245,7 +244,6 @@ function createList(obj){
       
     document.getElementById('empTable').innerHTML = rowString;
 }
-
 function requestForDelete(id){
  //  alert(id);
    var choice =  confirm("Are you sure, you want to delete this record")
@@ -253,7 +251,6 @@ function requestForDelete(id){
        deleteRecord(id);
     }           
 }
-
 function deleteRecord(id){
     var ajaxRequest = new XMLHttpRequest();
     if (ajaxRequest) 
@@ -275,7 +272,6 @@ function deleteRecord(id){
         }
   }
 }
-
 function updateRecord(id){
     var ajaxRequest = new XMLHttpRequest();
     if (ajaxRequest) {
@@ -347,7 +343,6 @@ function afterLogin(obj){
     }
    
 }
-
 //user invitation
 function inviteUser(){
     var obj = new Object();
@@ -450,7 +445,6 @@ function updateRec(id){
         }
   }
 }
-
 function CloseInput(){
     $("#formLogin").show();
     $("#afterLogin").hide();
@@ -499,11 +493,9 @@ function logout(){
     localStorage.clear();
     onload();
 }
-
 $("#upfile1").click(function () {
     $("#file1").trigger('click');
 });
-
 var imageData="";
 $(function () {
     $(":file").change(function () {
